@@ -458,3 +458,129 @@ footer span {
     color: var(--black);
     margin-bottom: .5rem;
 }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+
+/* Tablet y móvil grande */
+@media (max-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .cat-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  /* Nav */
+  nav {
+    padding: 0 1rem;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 64px;
+    gap: .5rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .search-form input {
+    width: 140px;
+  }
+
+  /* Main */
+  .main-content {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Page header */
+  .page-header h1 {
+    font-size: 2.5rem;
+  }
+
+  /* Cards */
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  /* Cat grid */
+  .cat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    flex-wrap: wrap;
+  }
+
+  /* Paginación */
+  .pagination li a,
+  .pagination li span {
+    width: 32px;
+    height: 32px;
+    font-size: .78rem;
+  }
+}
+
+/* Móvil */
+@media (max-width: 480px) {
+  /* Nav */
+  .nav-links a:not(.search-form *) {
+    font-size: .75rem;
+  }
+
+  .search-form input {
+    width: 100px;
+  }
+
+  /* Page header */
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  /* Cards — 1 columna en móvil pequeño */
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Cat grid — 2 columnas se mantiene */
+  .cat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: .75rem;
+  }
+
+  .cat-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .cat-name {
+    font-size: 1.3rem;
+  }
+
+  /* Breadcrumb más compacto */
+  .breadcrumb {
+    font-size: .72rem;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 2rem;
+    padding: 1.25rem 1rem;
+    
+  }
+ 
+
+  /* Empty state */
+  .empty-state {
+    padding: 3rem 1rem;
+  }
+}

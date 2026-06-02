@@ -23,12 +23,7 @@
 
     <!-- BUSCADOR -->
     <form class="buscar-form animate" @submit.prevent="buscar">
-      <input
-        v-model="inputQ"
-        type="text"
-        placeholder="Buscar zapatos, marcas, materiales..."
-        autofocus
-      />
+      <input v-model="inputQ" type="text" placeholder="Buscar zapatos, marcas, materiales..." autofocus />
       <button type="submit">Buscar</button>
     </form>
 
@@ -41,12 +36,7 @@
     <!-- RESULTADOS -->
     <template v-else-if="zapatos?.data?.length">
       <div class="cards-grid">
-        <ZapatoCard
-          v-for="(zapato, i) in zapatos.data"
-          :key="zapato.id"
-          :zapato="zapato"
-          :delay="(i % 4) + 1"
-        />
+        <ZapatoCard v-for="(zapato, i) in zapatos.data" :key="zapato.id" :zapato="zapato" :delay="(i % 4) + 1" />
       </div>
 
       <!-- PAGINACIÓN -->
@@ -55,11 +45,7 @@
           <li :class="{ disabled: !zapatos.prev_page_url }">
             <a @click.prevent="cambiarPagina(paginaActual - 1)" href="#">←</a>
           </li>
-          <li
-            v-for="p in zapatos.last_page"
-            :key="p"
-            :class="{ active: p === paginaActual }"
-          >
+          <li v-for="p in zapatos.last_page" :key="p" :class="{ active: p === paginaActual }">
             <a @click.prevent="cambiarPagina(p)" href="#">{{ p }}</a>
           </li>
           <li :class="{ disabled: !zapatos.next_page_url }">
@@ -90,20 +76,20 @@ import { useRoute, useRouter } from 'vue-router'
 import { buscarZapatos } from '@/services/api'
 import ZapatoCard from '@/components/ZapatoCard.vue'
 
-const route  = useRoute()
+const route = useRoute()
 const router = useRouter()
 
-const q            = ref('')
-const inputQ       = ref('')
-const zapatos      = ref(null)
-const cargando     = ref(false)
+const q = ref('')
+const inputQ = ref('')
+const zapatos = ref(null)
+const cargando = ref(false)
 const paginaActual = ref(1)
 
 async function cargar(pagina = 1) {
   cargando.value = true
   try {
     const res = await buscarZapatos({ q: q.value || undefined, page: pagina })
-    zapatos.value     = res.data.zapatos
+    zapatos.value = res.data.zapatos
     paginaActual.value = pagina
   } catch (e) {
     console.error(e)
@@ -125,13 +111,13 @@ function cambiarPagina(p) {
 
 // Sincronizar con query params de la URL
 watch(() => route.query.q, (val) => {
-  q.value      = val ?? ''
+  q.value = val ?? ''
   inputQ.value = val ?? ''
   cargar(1)
 })
 
 onMounted(() => {
-  q.value      = route.query.q ?? ''
+  q.value = route.query.q ?? ''
   inputQ.value = route.query.q ?? ''
   cargar(1)
 })
@@ -171,9 +157,13 @@ onMounted(() => {
   transition: background .2s;
 }
 
-.buscar-form button:hover { background: var(--accent); }
+.buscar-form button:hover {
+  background: var(--accent);
+}
 
 @media (max-width: 600px) {
-  .buscar-form { max-width: 100%; }
+  .buscar-form {
+    max-width: 100%;
+  }
 }
 </style>

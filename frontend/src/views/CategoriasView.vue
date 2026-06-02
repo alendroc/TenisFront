@@ -28,12 +28,8 @@
     </div>
 
     <div v-else class="cat-grid">
-      <RouterLink
-        v-for="(cat, i) in categorias"
-        :key="cat.id"
-        :to="`/categorias/${cat.id}`"
-        :class="`cat-card animate animate-delay-${(i % 4) + 1} ${catClase(cat.nombre)}`"
-      >
+      <RouterLink v-for="(cat, i) in categorias" :key="cat.id" :to="`/categorias/${cat.id}`"
+        :class="`cat-card animate animate-delay-${(i % 4) + 1} ${catClase(cat.nombre)}`">
         <span class="cat-icon">{{ catIcono(cat.nombre) }}</span>
         <div class="cat-name">{{ cat.nombre }}</div>
         <div class="cat-count">{{ cat.zapatos_count ?? 0 }} productos</div>
@@ -47,12 +43,7 @@
         <p>Los más populares de la temporada</p>
       </div>
       <div class="cards-grid">
-        <ZapatoCard
-          v-for="(zapato, i) in destacados"
-          :key="zapato.id"
-          :zapato="zapato"
-          :delay="(i % 4) + 1"
-        />
+        <ZapatoCard v-for="(zapato, i) in destacados" :key="zapato.id" :zapato="zapato" :delay="(i % 4) + 1" />
       </div>
     </template>
   </div>
@@ -68,11 +59,11 @@ const destacados = ref([])
 const cargando = ref(true)
 
 const catConfig = {
-  running:           { icono: '🏃', clase: 'cat-running' },
-  casual:            { icono: '👟', clase: 'cat-casual' },
-  formal:            { icono: '👞', clase: 'cat-formal' },
+  running: { icono: '🏃', clase: 'cat-running' },
+  casual: { icono: '👟', clase: 'cat-casual' },
+  formal: { icono: '👞', clase: 'cat-formal' },
   'deportivo mujer': { icono: '👠', clase: 'cat-deportivo-mujer' },
-  infantil:          { icono: '🧒', clase: 'cat-infantil' },
+  infantil: { icono: '🧒', clase: 'cat-infantil' },
 }
 
 function catClase(nombre) {
@@ -108,7 +99,10 @@ onMounted(async () => {
   position: relative;
 }
 
-.cat-hero-content { position: relative; z-index: 1; }
+.cat-hero-content {
+  position: relative;
+  z-index: 1;
+}
 
 .cat-hero-eyebrow {
   color: var(--accent);
@@ -145,8 +139,16 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
-  .cat-hero { padding: 2.5rem 1.5rem; }
-  .cat-hero-title { font-size: 3.5rem; }
-  .cat-hero-emoji { display: none; }
+  .cat-hero {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .cat-hero-title {
+    font-size: 3.5rem;
+  }
+
+  .cat-hero-emoji {
+    display: none;
+  }
 }
 </style>

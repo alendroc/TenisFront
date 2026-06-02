@@ -21,12 +21,8 @@
     <!-- FILTROS -->
     <div class="filtros-bar animate">
       <div class="search-inline">
-        <input
-          v-model="filtros.q"
-          type="text"
-          :placeholder="`Buscar en ${categoria?.nombre ?? 'esta categoría'}...`"
-          @keyup.enter="aplicarFiltros"
-        />
+        <input v-model="filtros.q" type="text" :placeholder="`Buscar en ${categoria?.nombre ?? 'esta categoría'}...`"
+          @keyup.enter="aplicarFiltros" />
         <button @click="aplicarFiltros">🔍</button>
       </div>
       <select v-model="filtros.orden" @change="aplicarFiltros">
@@ -46,12 +42,7 @@
     <!-- GRID -->
     <template v-else-if="zapatos?.data?.length">
       <div class="cards-grid">
-        <ZapatoCard
-          v-for="(zapato, i) in zapatos.data"
-          :key="zapato.id"
-          :zapato="zapato"
-          :delay="(i % 4) + 1"
-        />
+        <ZapatoCard v-for="(zapato, i) in zapatos.data" :key="zapato.id" :zapato="zapato" :delay="(i % 4) + 1" />
       </div>
 
       <!-- PAGINACIÓN -->
@@ -60,11 +51,7 @@
           <li :class="{ disabled: !zapatos.prev_page_url }">
             <a @click.prevent="cambiarPagina(paginaActual - 1)" href="#">←</a>
           </li>
-          <li
-            v-for="p in zapatos.last_page"
-            :key="p"
-            :class="{ active: p === paginaActual }"
-          >
+          <li v-for="p in zapatos.last_page" :key="p" :class="{ active: p === paginaActual }">
             <a @click.prevent="cambiarPagina(p)" href="#">{{ p }}</a>
           </li>
           <li :class="{ disabled: !zapatos.next_page_url }">
@@ -94,9 +81,9 @@ import ZapatoCard from '@/components/ZapatoCard.vue'
 
 const route = useRoute()
 
-const categoria   = ref(null)
-const zapatos     = ref(null)
-const cargando    = ref(true)
+const categoria = ref(null)
+const zapatos = ref(null)
+const cargando = ref(true)
 const paginaActual = ref(1)
 
 const filtros = reactive({ q: '', orden: '' })
@@ -105,12 +92,12 @@ async function cargar(pagina = 1) {
   cargando.value = true
   try {
     const res = await getCategoria(route.params.id, {
-      q:      filtros.q     || undefined,
-      orden:  filtros.orden || undefined,
-      page:   pagina,
+      q: filtros.q || undefined,
+      orden: filtros.orden || undefined,
+      page: pagina,
     })
-    categoria.value   = res.data.categoria
-    zapatos.value     = res.data.zapatos
+    categoria.value = res.data.categoria
+    zapatos.value = res.data.zapatos
     paginaActual.value = pagina
   } catch (e) {
     console.error(e)
@@ -184,7 +171,13 @@ select {
 }
 
 @media (max-width: 600px) {
-  .filtros-bar { flex-direction: column; align-items: stretch; }
-  .search-inline input { width: 100%; }
+  .filtros-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-inline input {
+    width: 100%;
+  }
 }
 </style>

@@ -35,11 +35,8 @@
       <!-- IMAGEN -->
       <div class="detail-img-wrap">
         <div class="detail-img-box">
-          <img
-            :src="zapato.imagen_principal || 'https://via.placeholder.com/600?text=Sin+imagen'"
-            :alt="zapato.nombre"
-            @error="e => e.target.src = 'https://via.placeholder.com/600?text=Sin+imagen'"
-          />
+          <img :src="zapato.imagen_principal || 'https://via.placeholder.com/600?text=Sin+imagen'" :alt="zapato.nombre"
+            @error="e => e.target.src = 'https://via.placeholder.com/600?text=Sin+imagen'" />
         </div>
         <div class="detail-badges">
           <span v-if="zapato.disponible" class="badge-stock ok">✓ En stock</span>
@@ -71,11 +68,8 @@
         <div v-if="zapato.tallas?.length" class="tallas-wrap">
           <p class="tallas-label">Tallas disponibles</p>
           <div class="tallas-grid">
-            <span
-              v-for="talla in zapato.tallas"
-              :key="talla.id"
-              :class="['talla-chip', { agotada: talla.stock === 0 }]"
-            >
+            <span v-for="talla in zapato.tallas" :key="talla.id"
+              :class="['talla-chip', { agotada: talla.stock === 0 }]">
               US {{ talla.talla_us }}
               <span class="talla-eu">/ EU {{ talla.talla_eu }}</span>
             </span>
@@ -89,10 +83,7 @@
           </button>
           <button v-else disabled class="btn-disabled">No disponible</button>
 
-          <RouterLink
-            :to="`/categorias/${zapato.categoria_id}`"
-            class="btn-ver btn-outline"
-          >
+          <RouterLink :to="`/categorias/${zapato.categoria_id}`" class="btn-ver btn-outline">
             ← Ver más
           </RouterLink>
         </div>
@@ -105,12 +96,7 @@
         <h1>MÁS EN ESTA CATEGORÍA</h1>
       </div>
       <div class="cards-grid">
-        <ZapatoCard
-          v-for="(rel, i) in relacionados"
-          :key="rel.id"
-          :zapato="rel"
-          :delay="(i % 4) + 1"
-        />
+        <ZapatoCard v-for="(rel, i) in relacionados" :key="rel.id" :zapato="rel" :delay="(i % 4) + 1" />
       </div>
     </template>
   </div>
@@ -122,26 +108,26 @@ import { useRoute, useRouter } from 'vue-router'
 import { getZapato, eliminarZapato } from '@/services/api'
 import ZapatoCard from '@/components/ZapatoCard.vue'
 
-const route  = useRoute()
+const route = useRoute()
 const router = useRouter()
 
-const zapato     = ref(null)
+const zapato = ref(null)
 const relacionados = ref([])
-const cargando   = ref(true)
+const cargando = ref(true)
 
 const specs = computed(() => zapato.value ? {
-  'Estilo':    zapato.value.estilo,
-  'Material':  zapato.value.material,
-  'Color':     zapato.value.color_principal,
+  'Estilo': zapato.value.estilo,
+  'Material': zapato.value.material,
+  'Color': zapato.value.color_principal,
   'Categoría': zapato.value.categoria?.nombre,
-  'Marca':     zapato.value.marca?.nombre,
+  'Marca': zapato.value.marca?.nombre,
 } : {})
 
 async function cargar() {
   cargando.value = true
   try {
     const res = await getZapato(route.params.id)
-    zapato.value     = res.data.zapato
+    zapato.value = res.data.zapato
     relacionados.value = res.data.relacionados ?? []
   } catch (e) {
     console.error(e)
@@ -186,7 +172,11 @@ onMounted(() => cargar())
   color: var(--accent);
 }
 
-.admin-actions-btns { display: flex; gap: .6rem; flex-wrap: wrap; }
+.admin-actions-btns {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
 
 .btn-admin-edit {
   background: var(--black);
@@ -203,7 +193,10 @@ onMounted(() => cargar())
   transition: background .2s;
   display: inline-block;
 }
-.btn-admin-edit:hover { background: #333; }
+
+.btn-admin-edit:hover {
+  background: #333;
+}
 
 .btn-admin-delete {
   background: transparent;
@@ -218,7 +211,11 @@ onMounted(() => cargar())
   cursor: pointer;
   transition: all .2s;
 }
-.btn-admin-delete:hover { background: #c62828; color: var(--white); }
+
+.btn-admin-delete:hover {
+  background: #c62828;
+  color: var(--white);
+}
 
 .detail-grid {
   display: grid;
@@ -227,7 +224,10 @@ onMounted(() => cargar())
   align-items: start;
 }
 
-.detail-img-wrap { position: sticky; top: 80px; }
+.detail-img-wrap {
+  position: sticky;
+  top: 80px;
+}
 
 .detail-img-box {
   border: 1.5px solid var(--border);
@@ -257,9 +257,21 @@ onMounted(() => cargar())
   border-radius: 2px;
   letter-spacing: .5px;
 }
-.badge-stock.ok { background: #e8f5e9; color: #2e7d32; }
-.badge-stock.no { background: #fce4ec; color: #c62828; }
-.badge-id { color: var(--gray); font-size: .8rem; }
+
+.badge-stock.ok {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge-stock.no {
+  background: #fce4ec;
+  color: #c62828;
+}
+
+.badge-id {
+  color: var(--gray);
+  font-size: .8rem;
+}
 
 .detail-marca {
   font-size: .75rem;
@@ -315,9 +327,19 @@ onMounted(() => cargar())
   border-bottom: 1px solid var(--border);
   font-size: .88rem;
 }
-.spec-row:last-child { border-bottom: none; }
-.spec-label { color: var(--gray); font-weight: 500; }
-.spec-valor { font-weight: 600; }
+
+.spec-row:last-child {
+  border-bottom: none;
+}
+
+.spec-label {
+  color: var(--gray);
+  font-weight: 500;
+}
+
+.spec-valor {
+  font-weight: 600;
+}
 
 .tallas-label {
   font-size: .75rem;
@@ -328,7 +350,12 @@ onMounted(() => cargar())
   margin-bottom: .75rem;
 }
 
-.tallas-grid { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 2rem; }
+.tallas-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 2rem;
+}
 
 .talla-chip {
   border: 1.5px solid var(--black);
@@ -345,9 +372,16 @@ onMounted(() => cargar())
   text-decoration: line-through;
 }
 
-.talla-eu { font-size: .7rem; color: var(--gray); }
+.talla-eu {
+  font-size: .7rem;
+  color: var(--gray);
+}
 
-.detail-acciones { display: flex; gap: 1rem; flex-wrap: wrap; }
+.detail-acciones {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
 
 .btn-disabled {
   flex: 1;
@@ -368,11 +402,23 @@ onMounted(() => cargar())
   color: var(--black);
   border: 1.5px solid var(--black);
 }
-.btn-outline:hover { background: var(--black); color: var(--white); }
+
+.btn-outline:hover {
+  background: var(--black);
+  color: var(--white);
+}
 
 @media (max-width: 768px) {
-  .detail-grid { grid-template-columns: 1fr; }
-  .detail-img-wrap { position: static; }
-  .detail-nombre { font-size: 2.2rem; }
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-img-wrap {
+    position: static;
+  }
+
+  .detail-nombre {
+    font-size: 2.2rem;
+  }
 }
 </style>
