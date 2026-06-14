@@ -1,132 +1,138 @@
 <template>
   <div>
     <!-- BREADCRUMB -->
-    <div class="breadcrumb animate">
-      <RouterLink to="/">Inicio</RouterLink>
+    <div class="flex gap-2 align-items-center text-xs uppercase mb-4 text-color-secondary" style="letter-spacing: .5px;">
+      <RouterLink to="/" class="text-color-secondary no-underline">Inicio</RouterLink>
       <span>/</span>
-      <RouterLink to="/admin/zapatos">Admin · Zapatos</RouterLink>
+      <RouterLink to="/admin/zapatos" class="text-color-secondary no-underline">Admin · Zapatos</RouterLink>
       <span>/</span>
-      <strong style="color:var(--black)">{{ esEdicion ? 'Editar' : 'Nuevo' }}</strong>
+      <strong style="color: var(--black);">{{ esEdicion ? 'Editar' : 'Nuevo' }}</strong>
     </div>
 
     <!-- HEADER -->
-    <div class="page-header animate">
-      <h1>{{ esEdicion ? 'EDITAR ZAPATO' : 'NUEVO ZAPATO' }}</h1>
-      <p v-if="esEdicion && zapato">ID #{{ String(zapato.id).padStart(4, '0') }} · {{ zapato.nombre }}</p>
-      <p v-else>Completá los campos para agregar un producto al catálogo.</p>
+    <div class="mb-5 pb-3" style="border-bottom: 2px solid var(--black);">
+      <h1 style="font-family: var(--font-display); font-size: 3.5rem; letter-spacing: 2px; line-height: 1;">
+        {{ esEdicion ? 'EDITAR ZAPATO' : 'NUEVO ZAPATO' }}
+      </h1>
+      <p v-if="esEdicion && zapato" class="text-color-secondary mt-2 mb-0">ID #{{ String(zapato.id).padStart(4, '0') }} · {{ zapato.nombre }}</p>
+      <p v-else class="text-color-secondary mt-2 mb-0">Completá los campos para agregar un producto al catálogo.</p>
     </div>
 
     <!-- INFORMACIÓN BÁSICA -->
-    <div class="form-card animate animate-delay-1">
-      <div class="form-card-header"><span>INFORMACIÓN BÁSICA</span></div>
-      <div class="form-card-body">
-        <div class="form-grid">
-          <div class="form-group full">
-            <label>Nombre *</label>
-            <input v-model="form.nombre" type="text" placeholder="Ej: Nike Air Max 270" />
-            <span v-if="errores.nombre" class="error-msg">{{ errores.nombre }}</span>
+    <Card class="border-round overflow-hidden mb-4"  style="background: var(--card-bg); color: var(--black);">
+      <template #header>
+        <div class="p-2 px-3" style="background: var(--black);">
+          <span style="font-family: var(--font-display); font-size: 1.2rem; color: var(--white); letter-spacing: 2px;">INFORMACIÓN BÁSICA</span>
+        </div>
+      </template>
+      <template #content>
+        <div class="grid">
+          <div class="col-12 flex flex-column gap-2">
+            <label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Nombre *</label>
+            <InputText v-model="form.nombre" placeholder="Ej: Nike Air Max 270" />
+            <span v-if="errores.nombre" class="text-sm font-semibold" style="color: var(--accent);">{{ errores.nombre }}</span>
           </div>
-          <div class="form-group">
-            <label>Categoría *</label>
-            <select v-model="form.categoria_id">
-              <option value="">Seleccioná una categoría</option>
-              <option v-for="cat in categorias" :key="cat.id" :value="cat.id">{{ cat.nombre }}</option>
-            </select>
-            <span v-if="errores.categoria_id" class="error-msg">{{ errores.categoria_id }}</span>
+          <div class="col-12 md:col-6 flex flex-column gap-2">
+            <label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Categoría *</label>
+            <Select v-model="form.categoria_id" :options="categorias" optionLabel="nombre" optionValue="id" placeholder="Seleccioná una categoría" />
+            <span v-if="errores.categoria_id" class="text-sm font-semibold" style="color: var(--accent);">{{ errores.categoria_id }}</span>
           </div>
-          <div class="form-group">
-            <label>Marca *</label>
-            <select v-model="form.marca_id">
-              <option value="">Seleccioná una marca</option>
-              <option v-for="marca in marcas" :key="marca.id" :value="marca.id">{{ marca.nombre }}</option>
-            </select>
-            <span v-if="errores.marca_id" class="error-msg">{{ errores.marca_id }}</span>
+          <div class="col-12 md:col-6 flex flex-column gap-2">
+            <label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Marca *</label>
+            <Select v-model="form.marca_id" :options="marcas" optionLabel="nombre" optionValue="id" placeholder="Seleccioná una marca" />
+            <span v-if="errores.marca_id" class="text-sm font-semibold" style="color: var(--accent);">{{ errores.marca_id }}</span>
           </div>
-          <div class="form-group full">
-            <label>Descripción</label>
-            <textarea v-model="form.descripcion" placeholder="Describí el producto..."></textarea>
+          <div class="col-12 flex flex-column gap-2">
+            <label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Descripción</label>
+            <Textarea v-model="form.descripcion" placeholder="Describí el producto..." rows="3" autoResize />
           </div>
         </div>
-      </div>
-    </div>
+      </template>
+    </Card>
 
     <!-- DETALLES -->
-    <div class="form-card animate animate-delay-2">
-      <div class="form-card-header"><span>DETALLES DEL PRODUCTO</span></div>
-      <div class="form-card-body">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Precio (USD) *</label>
-            <input v-model="form.precio" type="number" step="0.01" min="0" placeholder="0.00" />
-            <span v-if="errores.precio" class="error-msg">{{ errores.precio }}</span>
+    <Card class="border-round overflow-hidden mb-4" style="background: var(--card-bg); color: var(--black);">
+      <template #header>
+        <div class="p-2 px-3" style="background: var(--black);">
+          <span style="font-family: var(--font-display); font-size: 1.2rem; color: var(--white); letter-spacing: 2px;">DETALLES DEL PRODUCTO</span>
+        </div>
+      </template>
+      <template #content>
+        <div class="grid">
+          <div class="col-12 md:col-6 flex flex-column gap-2">
+            <label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Precio (USD) *</label>
+            <InputNumber v-model="form.precio" mode="decimal" :minFractionDigits="2" :min="0" placeholder="0.00" />
+            <span v-if="errores.precio" class="text-sm font-semibold" style="color: var(--accent);">{{ errores.precio }}</span>
           </div>
-          <div class="form-group">
-            <label>Estilo</label>
-            <input v-model="form.estilo" type="text" placeholder="Ej: Running, Oxford" />
+          <div class="col-12 md:col-6 flex flex-column gap-2">
+            <label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Estilo</label>
+            <InputText v-model="form.estilo" placeholder="Ej: Running, Oxford" />
           </div>
-          <div class="form-group">
-            <label>Material</label>
-            <input v-model="form.material" type="text" placeholder="Ej: Cuero, Malla" />
+          <div class="col-12 md:col-6 flex flex-column gap-2">
+            <label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Material</label>
+            <InputText v-model="form.material" placeholder="Ej: Cuero, Malla" />
           </div>
-          <div class="form-group">
-            <label>Color principal</label>
-            <input v-model="form.color_principal" type="text" placeholder="Ej: Negro, Blanco/Rojo" />
+          <div class="col-12 md:col-6 flex flex-column gap-2">
+            <label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Color principal</label>
+            <InputText v-model="form.color_principal" placeholder="Ej: Negro, Blanco/Rojo" />
           </div>
-          <div class="form-group">
-            <label>Imagen principal (URL)</label>
-            <input v-model="form.imagen_principal" type="text" placeholder="https://..." />
-            <div v-if="form.imagen_principal" style="margin-top:.75rem;">
-              <img :src="form.imagen_principal" style="max-width:220px; border-radius:8px; border:1px solid #ddd;"
-                @error="e => e.target.style.display = 'none'" />
-            </div>
+          <div class="col-12 md:col-6 flex flex-column gap-2">
+            <label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Imagen principal (URL)</label>
+            <InputText v-model="form.imagen_principal" placeholder="https://..." />
+            <img v-if="form.imagen_principal" :src="form.imagen_principal" style="max-width: 220px; border-radius: 8px; border: 1px solid #ddd;"
+              @error="e => e.target.style.display = 'none'" />
           </div>
-          <div class="form-group" style="justify-content:flex-end; padding-bottom:.2rem;">
-            <label>Disponibilidad</label>
-            <div class="toggle-wrap">
-              <input v-model="form.disponible" type="checkbox" id="disponible" />
-              <label for="disponible" class="toggle-label">Disponible para la venta</label>
+          <div class="col-12 md:col-6 flex align-items-end">
+            <div class="flex align-items-center gap-2">
+              <Checkbox v-model="form.disponible" binary inputId="disponible" />
+              <label for="disponible" class="text-sm" style="color: var(--black);">Disponible para la venta</label>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </template>
+    </Card>
 
     <!-- TALLAS -->
-    <div class="form-card animate animate-delay-3">
-      <div class="form-card-header"><span>TALLAS Y STOCK</span></div>
-      <div class="form-card-body">
-        <div class="tallas-header">
-          <label>Talla US</label>
-          <label>Talla EU</label>
-          <label>Stock</label>
-          <span></span>
+    <Card class="border-round overflow-hidden mb-4" style="background: var(--card-bg); color: var(--black);">
+      <template #header>
+        <div class="p-2 px-3" style="background: var(--black);">
+          <span style="font-family: var(--font-display); font-size: 1.2rem; color: var(--white); letter-spacing: 2px;">TALLAS Y STOCK</span>
         </div>
-        <div v-for="(talla, i) in tallas" :key="i" class="talla-row">
-          <input v-model="talla.talla_us" type="number" step="0.5" min="1" placeholder="Ej: 9.5" />
-          <input v-model="talla.talla_eu" type="number" step="0.5" min="30" placeholder="Ej: 43" />
-          <input v-model="talla.stock" type="number" min="0" placeholder="Ej: 10" />
-          <button type="button" class="btn-remove-talla" @click="removeTalla(i)"
-            :disabled="tallas.length === 1">✕</button>
+      </template>
+      <template #content>
+        <div class="grid mb-2">
+          <div class="col-4"><label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Talla US</label></div>
+          <div class="col-4"><label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Talla EU</label></div>
+          <div class="col-3"><label class="text-xs font-bold uppercase text-color-secondary" style="letter-spacing: 1.5px;">Stock</label></div>
+          <div class="col-1"></div>
         </div>
-        <button type="button" class="btn-add" @click="addTalla">+ Agregar talla</button>
-      </div>
-    </div>
+        <div v-for="(talla, i) in tallas" :key="i" class="grid mb-2 align-items-center">
+          <div class="col-4"><InputNumber v-model="talla.talla_us" :step="0.5" :min="1" placeholder="Ej: 9.5" class="w-full" /></div>
+          <div class="col-4"><InputNumber v-model="talla.talla_eu" :step="0.5" :min="30" placeholder="Ej: 43" class="w-full" /></div>
+          <div class="col-3"><InputNumber v-model="talla.stock" :min="0" placeholder="Ej: 10" class="w-full" /></div>
+          <div class="col-1">
+            <Button icon="pi pi-times" severity="danger" outlined size="small" @click="removeTalla(i)" :disabled="tallas.length === 1" />
+          </div>
+        </div>
+        <Button label="+ Agregar talla" outlined class="w-full mt-2" @click="addTalla" style="border-style: dashed; color: var(--gray); border-color: var(--border);" />
+      </template>
+    </Card>
 
     <!-- DANGER ZONE (solo edición) -->
-    <div v-if="esEdicion" class="danger-zone animate">
+    <div v-if="esEdicion" class="flex justify-content-between align-items-center gap-3 mt-3 p-3 border-round flex-wrap" style="border: 1.5px solid #fce4ec; background: #fff8f8;">
       <div>
-        <strong>Eliminar este zapato</strong>
-        <p>Esta acción es permanente y eliminará también todas sus tallas e imágenes.</p>
+        <strong style="color: #c62828;">Eliminar este zapato</strong>
+        <p class="text-sm text-color-secondary m-0">Esta acción es permanente y eliminará también todas sus tallas e imágenes.</p>
       </div>
-      <button class="btn-danger" @click="eliminar">Eliminar zapato</button>
+      <Button label="Eliminar zapato" severity="danger" outlined @click="eliminar" />
     </div>
 
     <!-- BOTONES -->
-    <div class="form-btns animate animate-delay-4">
-      <RouterLink to="/admin/zapatos" class="btn-cancel">Cancelar</RouterLink>
-      <button class="btn-primary" @click="guardar" :disabled="guardando">
-        {{ guardando ? 'Guardando...' : esEdicion ? 'Guardar cambios' : 'Guardar zapato' }}
-      </button>
+    <div class="flex gap-3 justify-content-end mt-4">
+      <RouterLink to="/admin/zapatos">
+        <Button label="Cancelar" outlined style="color: var(--black); border-color: var(--border);" />
+      </RouterLink>
+      <Button :label="guardando ? 'Guardando...' : esEdicion ? 'Guardar cambios' : 'Guardar zapato'" :disabled="guardando" @click="guardar" style="background: var(--accent); border-color: var(--accent); color: var(--white);" />
     </div>
   </div>
 </template>
@@ -138,6 +144,13 @@ import {
   getZapato, crearZapato, actualizarZapato, eliminarZapato,
   getCategorias, getMarcas, crearTalla, actualizarTalla, eliminarTalla,
 } from '@/services/api'
+import Card from 'primevue/card'
+import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
+import Textarea from 'primevue/textarea'
+import Select from 'primevue/select'
+import Checkbox from 'primevue/checkbox'
+import Button from 'primevue/button'
 
 const route = useRoute()
 const router = useRouter()
@@ -211,14 +224,12 @@ async function guardar() {
     const payload = { ...form }
 
     if (esEdicion.value) {
-      // Eliminar tallas borradas
       for (const id of tallasEliminadas.value) {
         await eliminarTalla(id)
       }
       tallasEliminadas.value = []
 
       await actualizarZapato(route.params.id, payload)
-      // Actualizar tallas existentes por separado
       for (const talla of tallas.value) {
         if (talla.id) {
           await actualizarTalla(talla.id, {
@@ -227,7 +238,6 @@ async function guardar() {
             stock: talla.stock,
           })
         } else {
-          // Talla nueva agregada durante la edición
           await crearTalla(route.params.id, {
             talla_us: talla.talla_us,
             talla_eu: talla.talla_eu,
@@ -263,269 +273,3 @@ async function eliminar() {
 
 onMounted(() => cargarDatos())
 </script>
-
-<style scoped>
-.form-card {
-  background: var(--card-bg);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-}
-
-.form-card-header {
-  background: var(--black);
-  padding: .7rem 1.25rem;
-}
-
-.form-card-header span {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  color: var(--white);
-  letter-spacing: 2px;
-}
-
-.form-card-body {
-  padding: 1.5rem 1.25rem;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: .4rem;
-}
-
-.form-group.full {
-  grid-column: 1 / -1;
-}
-
-label {
-  font-size: .75rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--gray);
-}
-
-input[type="text"],
-input[type="number"],
-select,
-textarea {
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: .55rem .9rem;
-  font-family: var(--font-body);
-  font-size: .9rem;
-  background: var(--white);
-  outline: none;
-  transition: border-color .2s;
-  width: 100%;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--black);
-}
-
-textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-.error-msg {
-  color: var(--accent);
-  font-size: .78rem;
-  font-weight: 600;
-}
-
-.toggle-wrap {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-}
-
-.toggle-wrap input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: var(--black);
-}
-
-.toggle-label {
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: .9rem;
-  color: var(--black);
-  cursor: pointer;
-}
-
-.tallas-header {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
-  gap: .75rem;
-  margin-bottom: .5rem;
-}
-
-.talla-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
-  gap: .75rem;
-  align-items: end;
-  margin-bottom: .75rem;
-}
-
-.btn-remove-talla {
-  background: transparent;
-  border: 1.5px solid var(--accent);
-  color: var(--accent);
-  border-radius: var(--radius);
-  padding: .5rem .75rem;
-  cursor: pointer;
-  font-size: .85rem;
-  transition: all .2s;
-}
-
-.btn-remove-talla:hover:not(:disabled) {
-  background: var(--accent);
-  color: var(--white);
-}
-
-.btn-remove-talla:disabled {
-  opacity: .4;
-  cursor: not-allowed;
-}
-
-.btn-add {
-  background: var(--cream);
-  border: 1.5px dashed var(--border);
-  color: var(--gray);
-  border-radius: var(--radius);
-  padding: .55rem 1.25rem;
-  cursor: pointer;
-  font-size: .82rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  transition: border-color .2s, color .2s;
-  width: 100%;
-  margin-top: .5rem;
-}
-
-.btn-add:hover {
-  border-color: var(--black);
-  color: var(--black);
-}
-
-.danger-zone {
-  border: 1.5px solid #fce4ec;
-  border-radius: var(--radius);
-  padding: 1.25rem 1.5rem;
-  background: #fff8f8;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1rem;
-  gap: 1rem;
-}
-
-.danger-zone p {
-  font-size: .85rem;
-  color: var(--gray);
-  margin: 0;
-}
-
-.danger-zone strong {
-  color: #c62828;
-}
-
-.btn-danger {
-  background: transparent;
-  color: #c62828;
-  border: 1.5px solid #c62828;
-  font-size: .8rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: .55rem 1.25rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
-}
-
-.btn-danger:hover {
-  background: #c62828;
-  color: var(--white);
-}
-
-.form-btns {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: .5rem;
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: var(--white);
-  font-size: .85rem;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: .75rem 2rem;
-  border-radius: var(--radius);
-  border: none;
-  cursor: pointer;
-  transition: background .2s;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #a83f1f;
-}
-
-.btn-primary:disabled {
-  opacity: .6;
-  cursor: not-allowed;
-}
-
-.btn-cancel {
-  background: transparent;
-  color: var(--black);
-  font-size: .85rem;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: .75rem 1.5rem;
-  border-radius: var(--radius);
-  border: 1.5px solid var(--border);
-  text-decoration: none;
-  transition: border-color .2s;
-  display: inline-block;
-}
-
-.btn-cancel:hover {
-  border-color: var(--black);
-}
-
-@media (max-width: 600px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .form-group.full {
-    grid-column: 1;
-  }
-
-  .tallas-header,
-  .talla-row {
-    grid-template-columns: 1fr 1fr 1fr auto;
-  }
-}
-</style>

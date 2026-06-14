@@ -1,16 +1,18 @@
 <template>
   <div>
     <!-- BREADCRUMB -->
-    <div class="breadcrumb animate">
-      <RouterLink to="/">Inicio</RouterLink>
+    <div class="flex gap-2 align-items-center text-xs uppercase mb-4 text-color-secondary" style="letter-spacing: .5px;">
+      <RouterLink to="/" class="text-color-secondary no-underline">Inicio</RouterLink>
       <span>/</span>
-      <strong style="color:var(--black)">{{ q ? 'Búsqueda' : 'Todos los productos' }}</strong>
+      <strong style="color: var(--black);">{{ q ? 'Búsqueda' : 'Todos los productos' }}</strong>
     </div>
 
     <!-- HEADER -->
-    <div class="page-header animate">
-      <h1>{{ q ? 'RESULTADOS' : 'TODOS LOS PRODUCTOS' }}</h1>
-      <p v-if="zapatos">
+    <div class="mb-5 pb-3" style="border-bottom: 2px solid var(--black);">
+      <h1 style="font-family: var(--font-display); font-size: 3.5rem; letter-spacing: 2px; line-height: 1;">
+        {{ q ? 'RESULTADOS' : 'TODOS LOS PRODUCTOS' }}
+      </h1>
+      <p v-if="zapatos" class="text-color-secondary mt-2 mb-0">
         <template v-if="q">
           {{ zapatos.total }} resultado{{ zapatos.total !== 1 ? 's' : '' }} para
           <strong>"{{ q }}"</strong>
@@ -22,49 +24,46 @@
     </div>
 
     <!-- BUSCADOR -->
-    <form class="buscar-form animate" @submit.prevent="buscar">
-      <input v-model="inputQ" type="text" placeholder="Buscar zapatos, marcas, materiales..." autofocus />
-      <button type="submit">Buscar</button>
+    <form @submit.prevent="buscar" class="p-inputgroup mb-5" style="max-width: 560px;">
+      <InputText v-model="inputQ" placeholder="Buscar zapatos, marcas, materiales..." autofocus />
+      <Button type="submit" label="Buscar" style="background: var(--black); border-color: var(--black); color: var(--white);" />
     </form>
 
     <!-- CARGANDO -->
-    <div v-if="cargando" class="empty-state">
-      <span class="emoji">⏳</span>
-      <h3>Cargando...</h3>
+    <div v-if="cargando" class="text-center py-8 text-color-secondary">
+      <ProgressSpinner />
+      <h3 style="font-family: var(--font-display); font-size: 2rem;">Cargando...</h3>
     </div>
 
     <!-- RESULTADOS -->
     <template v-else-if="zapatos?.data?.length">
-      <div class="cards-grid">
-        <ZapatoCard v-for="(zapato, i) in zapatos.data" :key="zapato.id" :zapato="zapato" :delay="(i % 4) + 1" />
+      <div class="grid">
+        <div v-for="zapato in zapatos.data" :key="zapato.id" class="col-12 sm:col-6 md:col-4 lg:col-3">
+          <ZapatoCard :zapato="zapato" />
+        </div>
       </div>
 
       <!-- PAGINACIÓN -->
-      <div class="pagination-wrap">
-        <ul class="pagination">
-          <li :class="{ disabled: !zapatos.prev_page_url }">
-            <a @click.prevent="cambiarPagina(paginaActual - 1)" href="#">←</a>
-          </li>
-          <li v-for="p in zapatos.last_page" :key="p" :class="{ active: p === paginaActual }">
-            <a @click.prevent="cambiarPagina(p)" href="#">{{ p }}</a>
-          </li>
-          <li :class="{ disabled: !zapatos.next_page_url }">
-            <a @click.prevent="cambiarPagina(paginaActual + 1)" href="#">→</a>
-          </li>
-        </ul>
+      <div class="flex justify-content-center mt-5">
+        <Paginator
+          :rows="1"
+          :totalRecords="zapatos.last_page"
+          :first="paginaActual - 1"
+          @page="e => cambiarPagina(e.page + 1)"
+        />
       </div>
     </template>
 
     <!-- SIN RESULTADOS -->
-    <div v-else-if="q" class="empty-state animate">
-      <span class="emoji">👟</span>
-      <h3>Sin resultados</h3>
+    <div v-else-if="q" class="text-center py-8 text-color-secondary">
+      <span class="text-6xl mb-3 block">👟</span>
+      <h3 style="font-family: var(--font-display); font-size: 2rem; color: var(--black);">Sin resultados</h3>
       <p>No encontramos productos para <strong>"{{ q }}"</strong>.</p>
-      <p style="margin-top:.5rem; font-size:.88rem;">
+      <p class="mt-2" style="font-size: .88rem;">
         Intenta con otro término o explorá nuestras categorías.
       </p>
-      <RouterLink to="/categorias" class="btn-ver" style="display:inline-block; margin-top:1.5rem;">
-        Ver Categorías
+      <RouterLink to="/categorias">
+        <Button label="Ver Categorías" class="mt-4" style="background: var(--black); border-color: var(--black); color: var(--white);" />
       </RouterLink>
     </div>
   </div>
@@ -75,6 +74,10 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { buscarZapatos } from '@/services/api'
 import ZapatoCard from '@/components/ZapatoCard.vue'
+import InputText from 'primevue/inputtext'
+import Button from 'primevue/button'
+import ProgressSpinner from 'primevue/progressspinner'
+import Paginator from 'primevue/paginator'
 
 const route = useRoute()
 const router = useRouter()
@@ -109,7 +112,6 @@ function cambiarPagina(p) {
   cargar(p)
 }
 
-// Sincronizar con query params de la URL
 watch(() => route.query.q, (val) => {
   q.value = val ?? ''
   inputQ.value = val ?? ''
@@ -122,48 +124,3 @@ onMounted(() => {
   cargar(1)
 })
 </script>
-
-<style scoped>
-.buscar-form {
-  display: flex;
-  max-width: 560px;
-  margin-bottom: 2.5rem;
-  border: 2px solid var(--black);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.buscar-form input {
-  flex: 1;
-  border: none;
-  outline: none;
-  padding: .65rem 1.25rem;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  background: var(--white);
-}
-
-.buscar-form button {
-  background: var(--black);
-  border: none;
-  color: var(--white);
-  padding: .65rem 1.25rem;
-  cursor: pointer;
-  font-size: .9rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  font-family: var(--font-body);
-  transition: background .2s;
-}
-
-.buscar-form button:hover {
-  background: var(--accent);
-}
-
-@media (max-width: 600px) {
-  .buscar-form {
-    max-width: 100%;
-  }
-}
-</style>

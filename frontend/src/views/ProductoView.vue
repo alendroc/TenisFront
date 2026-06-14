@@ -1,90 +1,95 @@
 <template>
   <div>
     <!-- BREADCRUMB -->
-    <div class="breadcrumb animate">
-      <RouterLink to="/">Inicio</RouterLink>
+    <div class="flex gap-2 align-items-center text-xs uppercase mb-4 text-color-secondary flex-wrap" style="letter-spacing: .5px;">
+      <RouterLink to="/" class="text-color-secondary no-underline">Inicio</RouterLink>
       <span>/</span>
-      <RouterLink to="/categorias">Categorías</RouterLink>
+      <RouterLink to="/categorias" class="text-color-secondary no-underline">Categorías</RouterLink>
       <span>/</span>
-      <RouterLink v-if="zapato" :to="`/categorias/${zapato.categoria_id}`">
+      <RouterLink v-if="zapato" :to="`/categorias/${zapato.categoria_id}`" class="text-color-secondary no-underline">
         {{ zapato.categoria?.nombre ?? 'Categoría' }}
       </RouterLink>
       <span>/</span>
-      <strong style="color:var(--black)">{{ zapato?.nombre ?? '...' }}</strong>
+      <strong style="color: var(--black);">{{ zapato?.nombre ?? '...' }}</strong>
     </div>
 
     <!-- BARRA ADMIN -->
-    <div class="admin-actions-bar animate">
-      <span>⚙ Administrar producto</span>
-      <div class="admin-actions-btns">
-        <RouterLink to="/admin/zapatos" class="btn-admin-edit">☰ Todos los zapatos</RouterLink>
-        <RouterLink v-if="zapato" :to="`/admin/zapatos/${zapato.id}/editar`" class="btn-admin-edit">Editar</RouterLink>
-        <button class="btn-admin-delete" @click="eliminar">✕ Eliminar</button>
+    <div class="flex align-items-center justify-content-between gap-3 flex-wrap mb-4 p-3 border-round" style="background: #fff8f0; border: 1.5px solid #f0d9c8;">
+      <span class="text-xs font-bold uppercase" style="letter-spacing: 1.5px; color: var(--accent);">⚙ Administrar producto</span>
+      <div class="flex gap-2 flex-wrap">
+        <RouterLink to="/admin/zapatos">
+          <Button label="☰ Todos los zapatos" size="small" style="background: var(--black); border-color: var(--black); color: var(--white);" />
+        </RouterLink>
+        <RouterLink v-if="zapato" :to="`/admin/zapatos/${zapato.id}/editar`">
+          <Button label="Editar" size="small" style="background: var(--black); border-color: var(--black); color: var(--white);" />
+        </RouterLink>
+        <Button label="✕ Eliminar" size="small" severity="danger" outlined @click="eliminar" />
       </div>
     </div>
 
     <!-- CARGANDO -->
-    <div v-if="cargando" class="empty-state">
-      <span class="emoji">⏳</span>
-      <h3>Cargando...</h3>
+    <div v-if="cargando" class="text-center py-8 text-color-secondary">
+      <ProgressSpinner />
+      <h3 style="font-family: var(--font-display); font-size: 2rem;">Cargando...</h3>
     </div>
 
     <!-- DETALLE -->
-    <div v-else-if="zapato" class="detail-grid animate">
+    <div v-else-if="zapato" class="grid">
 
       <!-- IMAGEN -->
-      <div class="detail-img-wrap">
-        <div class="detail-img-box">
-          <img :src="zapato.imagen_principal || 'https://via.placeholder.com/600?text=Sin+imagen'" :alt="zapato.nombre"
+      <div class="col-12 md:col-6">
+        <div class="border-round overflow-hidden" style="border: 1.5px solid var(--border); background: var(--cream);">
+          <img class="w-full block" style="aspect-ratio: 1; object-fit: cover;"
+            :src="zapato.imagen_principal || 'https://via.placeholder.com/600?text=Sin+imagen'" :alt="zapato.nombre"
             @error="e => e.target.src = 'https://via.placeholder.com/600?text=Sin+imagen'" />
         </div>
-        <div class="detail-badges">
-          <span v-if="zapato.disponible" class="badge-stock ok">✓ En stock</span>
-          <span v-else class="badge-stock no">✗ Agotado</span>
-          <span class="badge-id">ID: #{{ String(zapato.id).padStart(4, '0') }}</span>
+        <div class="flex gap-3 align-items-center mt-3">
+          <Tag v-if="zapato.disponible" value="✓ En stock" style="background: #e8f5e9; color: #2e7d32;" />
+          <Tag v-else value="✗ Agotado" style="background: #fce4ec; color: #c62828;" />
+          <span class="text-sm text-color-secondary">ID: #{{ String(zapato.id).padStart(4, '0') }}</span>
         </div>
       </div>
 
       <!-- INFO -->
-      <div class="detail-info">
-        <p class="detail-marca">{{ zapato.marca?.nombre ?? 'Marca' }}</p>
-        <h1 class="detail-nombre">{{ zapato.nombre?.toUpperCase() }}</h1>
-        <p class="detail-desc">{{ zapato.descripcion }}</p>
+      <div class="col-12 md:col-6">
+        <p class="text-xs font-bold uppercase mb-2" style="letter-spacing: 3px; color: var(--accent);">{{ zapato.marca?.nombre ?? 'Marca' }}</p>
+        <h1 class="mb-3" style="font-family: var(--font-display); font-size: 3rem; letter-spacing: 2px; line-height: 1.1;">{{ zapato.nombre?.toUpperCase() }}</h1>
+        <p class="mb-4 line-height-3 text-color-secondary">{{ zapato.descripcion }}</p>
 
-        <div class="detail-precio">
+        <div class="mb-4" style="font-family: var(--font-display); font-size: 3.5rem; letter-spacing: 2px;">
           ${{ Number(zapato.precio).toFixed(2) }}
         </div>
 
         <!-- ESPECIFICACIONES -->
-        <div class="specs-box">
-          <div class="specs-header">ESPECIFICACIONES</div>
-          <div v-for="(valor, label) in specs" :key="label" class="spec-row">
-            <span class="spec-label">{{ label }}</span>
-            <span class="spec-valor">{{ valor ?? '—' }}</span>
+        <div class="border-round overflow-hidden mb-5" style="border: 1.5px solid var(--border);">
+          <div class="p-2 px-3" style="background: var(--black); font-family: var(--font-display); font-size: 1.1rem; color: var(--white); letter-spacing: 2px;">
+            ESPECIFICACIONES
+          </div>
+          <div v-for="(valor, label) in specs" :key="label" class="flex justify-content-between p-3 text-sm" style="border-bottom: 1px solid var(--border);">
+            <span class="text-color-secondary font-medium">{{ label }}</span>
+            <span class="font-semibold">{{ valor ?? '—' }}</span>
           </div>
         </div>
 
         <!-- TALLAS -->
-        <div v-if="zapato.tallas?.length" class="tallas-wrap">
-          <p class="tallas-label">Tallas disponibles</p>
-          <div class="tallas-grid">
-            <span v-for="talla in zapato.tallas" :key="talla.id"
-              :class="['talla-chip', { agotada: talla.stock === 0 }]">
-              US {{ talla.talla_us }}
-              <span class="talla-eu">/ EU {{ talla.talla_eu }}</span>
-            </span>
+        <div v-if="zapato.tallas?.length" class="mb-5">
+          <p class="text-xs font-bold uppercase mb-3 text-color-secondary" style="letter-spacing: 1.5px;">Tallas disponibles</p>
+          <div class="flex flex-wrap gap-2">
+            <Tag v-for="talla in zapato.tallas" :key="talla.id"
+              :value="`US ${talla.talla_us} / EU ${talla.talla_eu}`"
+              :style="talla.stock === 0
+                ? 'background: transparent; border: 1.5px solid var(--border); color: var(--gray); text-decoration: line-through;'
+                : 'background: transparent; border: 1.5px solid var(--black); color: var(--black);'" />
           </div>
         </div>
 
         <!-- ACCIONES -->
-        <div class="detail-acciones">
-          <button v-if="zapato.disponible" class="btn-ver" style="flex:1; padding:.75rem; text-align:center;">
-            Agregar al carrito
-          </button>
-          <button v-else disabled class="btn-disabled">No disponible</button>
+        <div class="flex gap-3 flex-wrap">
+          <Button v-if="zapato.disponible" label="Agregar al carrito" class="flex-1" style="background: var(--black); border-color: var(--black); color: var(--white);" />
+          <Button v-else label="No disponible" disabled class="flex-1" />
 
-          <RouterLink :to="`/categorias/${zapato.categoria_id}`" class="btn-ver btn-outline">
-            ← Ver más
+          <RouterLink :to="`/categorias/${zapato.categoria_id}`">
+            <Button label="← Ver más" outlined style="color: var(--black); border-color: var(--black);" />
           </RouterLink>
         </div>
       </div>
@@ -92,11 +97,13 @@
 
     <!-- RELACIONADOS -->
     <template v-if="relacionados.length">
-      <div class="page-header" style="margin-top:4rem;">
-        <h1>MÁS EN ESTA CATEGORÍA</h1>
+      <div class="mb-5 pb-3 mt-7" style="border-bottom: 2px solid var(--black);">
+        <h1 style="font-family: var(--font-display); font-size: 3.5rem; letter-spacing: 2px; line-height: 1;">MÁS EN ESTA CATEGORÍA</h1>
       </div>
-      <div class="cards-grid">
-        <ZapatoCard v-for="(rel, i) in relacionados" :key="rel.id" :zapato="rel" :delay="(i % 4) + 1" />
+      <div class="grid">
+        <div v-for="rel in relacionados" :key="rel.id" class="col-12 sm:col-6 md:col-4 lg:col-3">
+          <ZapatoCard :zapato="rel" />
+        </div>
       </div>
     </template>
   </div>
@@ -107,6 +114,9 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getZapato, eliminarZapato } from '@/services/api'
 import ZapatoCard from '@/components/ZapatoCard.vue'
+import Button from 'primevue/button'
+import Tag from 'primevue/tag'
+import ProgressSpinner from 'primevue/progressspinner'
 
 const route = useRoute()
 const router = useRouter()
@@ -149,276 +159,3 @@ async function eliminar() {
 watch(() => route.params.id, () => cargar())
 onMounted(() => cargar())
 </script>
-
-<style scoped>
-.admin-actions-bar {
-  background: #fff8f0;
-  border: 1.5px solid #f0d9c8;
-  border-radius: var(--radius);
-  padding: .75rem 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.admin-actions-bar span {
-  font-size: .78rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.admin-actions-btns {
-  display: flex;
-  gap: .6rem;
-  flex-wrap: wrap;
-}
-
-.btn-admin-edit {
-  background: var(--black);
-  color: var(--white);
-  text-decoration: none;
-  font-size: .75rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: .45rem 1rem;
-  border-radius: var(--radius);
-  border: none;
-  cursor: pointer;
-  transition: background .2s;
-  display: inline-block;
-}
-
-.btn-admin-edit:hover {
-  background: #333;
-}
-
-.btn-admin-delete {
-  background: transparent;
-  color: #c62828;
-  font-size: .75rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: .45rem 1rem;
-  border-radius: var(--radius);
-  border: 1.5px solid #c62828;
-  cursor: pointer;
-  transition: all .2s;
-}
-
-.btn-admin-delete:hover {
-  background: #c62828;
-  color: var(--white);
-}
-
-.detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  align-items: start;
-}
-
-.detail-img-wrap {
-  position: sticky;
-  top: 80px;
-}
-
-.detail-img-box {
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--cream);
-}
-
-.detail-img-box img {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  display: block;
-}
-
-.detail-badges {
-  margin-top: 1rem;
-  display: flex;
-  gap: .75rem;
-  align-items: center;
-}
-
-.badge-stock {
-  font-size: .78rem;
-  font-weight: 600;
-  padding: .3rem .8rem;
-  border-radius: 2px;
-  letter-spacing: .5px;
-}
-
-.badge-stock.ok {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.badge-stock.no {
-  background: #fce4ec;
-  color: #c62828;
-}
-
-.badge-id {
-  color: var(--gray);
-  font-size: .8rem;
-}
-
-.detail-marca {
-  font-size: .75rem;
-  font-weight: 700;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: .5rem;
-}
-
-.detail-nombre {
-  font-family: var(--font-display);
-  font-size: 3rem;
-  letter-spacing: 2px;
-  line-height: 1.1;
-  margin-bottom: 1rem;
-}
-
-.detail-desc {
-  color: var(--gray);
-  line-height: 1.8;
-  margin-bottom: 1.75rem;
-  font-size: .95rem;
-}
-
-.detail-precio {
-  font-family: var(--font-display);
-  font-size: 3.5rem;
-  letter-spacing: 2px;
-  margin-bottom: 1.75rem;
-}
-
-.specs-box {
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin-bottom: 2rem;
-}
-
-.specs-header {
-  background: var(--black);
-  padding: .6rem 1rem;
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  color: var(--white);
-  letter-spacing: 2px;
-}
-
-.spec-row {
-  display: flex;
-  justify-content: space-between;
-  padding: .75rem 1rem;
-  border-bottom: 1px solid var(--border);
-  font-size: .88rem;
-}
-
-.spec-row:last-child {
-  border-bottom: none;
-}
-
-.spec-label {
-  color: var(--gray);
-  font-weight: 500;
-}
-
-.spec-valor {
-  font-weight: 600;
-}
-
-.tallas-label {
-  font-size: .75rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--gray);
-  margin-bottom: .75rem;
-}
-
-.tallas-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  margin-bottom: 2rem;
-}
-
-.talla-chip {
-  border: 1.5px solid var(--black);
-  color: var(--black);
-  font-size: .82rem;
-  font-weight: 600;
-  padding: .35rem .75rem;
-  border-radius: var(--radius);
-}
-
-.talla-chip.agotada {
-  border-color: var(--border);
-  color: var(--gray);
-  text-decoration: line-through;
-}
-
-.talla-eu {
-  font-size: .7rem;
-  color: var(--gray);
-}
-
-.detail-acciones {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.btn-disabled {
-  flex: 1;
-  padding: .75rem;
-  font-size: .88rem;
-  background: var(--border);
-  color: var(--gray);
-  border: none;
-  border-radius: var(--radius);
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: not-allowed;
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--black);
-  border: 1.5px solid var(--black);
-}
-
-.btn-outline:hover {
-  background: var(--black);
-  color: var(--white);
-}
-
-@media (max-width: 768px) {
-  .detail-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .detail-img-wrap {
-    position: static;
-  }
-
-  .detail-nombre {
-    font-size: 2.2rem;
-  }
-}
-</style>

@@ -1,49 +1,56 @@
 <template>
   <div>
     <!-- HERO BANNER -->
-    <div class="cat-hero animate">
-      <div class="cat-hero-content">
-        <p class="cat-hero-eyebrow">Nueva Colección 2025</p>
-        <h1 class="cat-hero-title">EL PASO<br>PERFECTO</h1>
-        <p class="cat-hero-sub">
+    <div class="border-round p-5 md:p-6 mb-6 flex justify-content-between align-items-center relative overflow-hidden" style="background: var(--black);">
+      <div class="relative z-1">
+        <p class="text-xs font-semibold uppercase mb-2" style="color: var(--accent); letter-spacing: 3px;">Nueva Colección 2025</p>
+        <h1 class="mb-3" style="font-family: var(--font-display); font-size: 5rem; color: var(--white); letter-spacing: 3px; line-height: 1;">EL PASO<br>PERFECTO</h1>
+        <p class="mb-4 line-height-3" style="color: var(--gray); max-width: 380px;">
           Descubre nuestra selección de calzado de las mejores marcas.
           Desde sneakers hasta botas, para cada momento.
         </p>
-        <RouterLink to="/categorias" class="btn-ver" style="font-size:.9rem; padding:.65rem 1.5rem;">
-          Ver Categorías →
+        <RouterLink to="/categorias">
+          <Button label="Ver Categorías →" style="background: var(--black); border-color: var(--white); color: var(--white);" />
         </RouterLink>
       </div>
-      <div class="cat-hero-emoji">👟</div>
+      <div class="absolute hidden md:block" style="font-size: 10rem; opacity: .07; right: 2rem; top: 50%; transform: translateY(-50%);">👟</div>
     </div>
 
     <!-- CATEGORÍAS -->
-    <div class="page-header animate">
-      <h1>CATEGORÍAS</h1>
-      <p>Encuentra tu estilo perfecto</p>
+    <div class="mb-5 pb-3" style="border-bottom: 2px solid var(--black);">
+      <h1 style="font-family: var(--font-display); font-size: 3.5rem; letter-spacing: 2px; line-height: 1;">CATEGORÍAS</h1>
+      <p class="text-color-secondary mt-2 mb-0">Encuentra tu estilo perfecto</p>
     </div>
 
-    <div v-if="cargando" class="empty-state">
-      <span class="emoji">⏳</span>
-      <h3>Cargando...</h3>
+    <div v-if="cargando" class="text-center py-8 text-color-secondary">
+      <ProgressSpinner />
+      <h3 style="font-family: var(--font-display); font-size: 2rem;">Cargando...</h3>
     </div>
 
-    <div v-else class="cat-grid">
-      <RouterLink v-for="(cat, i) in categorias" :key="cat.id" :to="`/categorias/${cat.id}`"
-        :class="`cat-card animate animate-delay-${(i % 4) + 1} ${catClase(cat.nombre)}`">
-        <span class="cat-icon">{{ catIcono(cat.nombre) }}</span>
-        <div class="cat-name">{{ cat.nombre }}</div>
-        <div class="cat-count">{{ cat.zapatos_count ?? 0 }} productos</div>
-      </RouterLink>
+    <div v-else class="grid">
+      <div v-for="cat in categorias" :key="cat.id" class="col-6 md:col-4 lg:col-3">
+        <RouterLink :to="`/categorias/${cat.id}`" class="no-underline">
+          <Card class="border-round overflow-hidden text-white" :style="`background: ${catGradiente(cat.nombre)};`">
+            <template #content>
+              <span class="text-4xl mb-2 block">{{ catIcono(cat.nombre) }}</span>
+              <div style="font-family: var(--font-display); font-size: 1.6rem; letter-spacing: 2px;">{{ cat.nombre }}</div>
+              <div class="text-xs mt-1" style="letter-spacing: 1px; color: rgba(255,255,255,.6);">{{ cat.zapatos_count ?? 0 }} productos</div>
+            </template>
+          </Card>
+        </RouterLink>
+      </div>
     </div>
 
     <!-- DESTACADOS -->
     <template v-if="destacados.length">
-      <div class="page-header animate" style="margin-top:3.5rem;">
-        <h1>DESTACADOS</h1>
-        <p>Los más populares de la temporada</p>
+      <div class="mb-5 pb-3 mt-7" style="border-bottom: 2px solid var(--black);">
+        <h1 style="font-family: var(--font-display); font-size: 3.5rem; letter-spacing: 2px; line-height: 1;">DESTACADOS</h1>
+        <p class="text-color-secondary mt-2 mb-0">Los más populares de la temporada</p>
       </div>
-      <div class="cards-grid">
-        <ZapatoCard v-for="(zapato, i) in destacados" :key="zapato.id" :zapato="zapato" :delay="(i % 4) + 1" />
+      <div class="grid">
+        <div v-for="zapato in destacados" :key="zapato.id" class="col-12 sm:col-6 md:col-4 lg:col-3">
+          <ZapatoCard :zapato="zapato" />
+        </div>
       </div>
     </template>
   </div>
@@ -53,21 +60,25 @@
 import { ref, onMounted } from 'vue'
 import { getCategorias } from '@/services/api'
 import ZapatoCard from '@/components/ZapatoCard.vue'
+import Card from 'primevue/card'
+import Button from 'primevue/button'
+import ProgressSpinner from 'primevue/progressspinner'
 
 const categorias = ref([])
 const destacados = ref([])
 const cargando = ref(true)
 
 const catConfig = {
-  running: { icono: '🏃', clase: 'cat-running' },
-  casual: { icono: '👟', clase: 'cat-casual' },
-  formal: { icono: '👞', clase: 'cat-formal' },
-  'deportivo mujer': { icono: '👠', clase: 'cat-deportivo-mujer' },
-  infantil: { icono: '🧒', clase: 'cat-infantil' },
+  running: { icono: '🏃', gradiente: 'linear-gradient(135deg, #b89070, #9a7358)' },
+  casual: { icono: '👟', gradiente: 'linear-gradient(135deg, #7898b0, #5a7a96)' },
+  formal: { icono: '👞', gradiente: 'linear-gradient(135deg, #6a7a7e, #4e5e62)' },
+  'deportivo mujer': { icono: '👠', gradiente: 'linear-gradient(135deg, #b07888, #966070)' },
+  infantil: { icono: '🧒', gradiente: 'linear-gradient(135deg, #7aaa8e, #5e9070)' },
 }
+const defaultGradiente = 'linear-gradient(135deg, #909898, #707880)'
 
-function catClase(nombre) {
-  return catConfig[nombre.toLowerCase()]?.clase ?? 'cat-default'
+function catGradiente(nombre) {
+  return catConfig[nombre.toLowerCase()]?.gradiente ?? defaultGradiente
 }
 function catIcono(nombre) {
   return catConfig[nombre.toLowerCase()]?.icono ?? '👟'
@@ -85,70 +96,3 @@ onMounted(async () => {
   }
 })
 </script>
-
-<style scoped>
-.cat-hero {
-  background: var(--black);
-  border-radius: var(--radius);
-  padding: 4rem 3rem;
-  margin-bottom: 3rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-}
-
-.cat-hero-content {
-  position: relative;
-  z-index: 1;
-}
-
-.cat-hero-eyebrow {
-  color: var(--accent);
-  font-size: .8rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin-bottom: .75rem;
-}
-
-.cat-hero-title {
-  font-family: var(--font-display);
-  font-size: 5rem;
-  color: var(--white);
-  letter-spacing: 3px;
-  line-height: 1;
-  margin-bottom: 1.25rem;
-}
-
-.cat-hero-sub {
-  color: var(--gray);
-  max-width: 380px;
-  margin-bottom: 1.75rem;
-  line-height: 1.7;
-}
-
-.cat-hero-emoji {
-  font-size: 10rem;
-  opacity: .07;
-  position: absolute;
-  right: 2rem;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-@media (max-width: 768px) {
-  .cat-hero {
-    padding: 2.5rem 1.5rem;
-  }
-
-  .cat-hero-title {
-    font-size: 3.5rem;
-  }
-
-  .cat-hero-emoji {
-    display: none;
-  }
-}
-</style>
